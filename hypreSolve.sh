@@ -5,4 +5,4 @@ cd $HYPREHOME
 NPROC=$2
 
 # Call hypreSolver
-mpirun -np $NPROC hypreMatlabSolve
+time mpirun -np $NPROC hypreMatlabSolve
