@@ -301,7 +301,7 @@ int main (int argc, char *argv[])
 
     /* Variables used for the loop */
     int it, max_it;
-    it = 0;
+    it = 1;
     max_it = 5000;
     double tol_r, tol_d;
     tol_r = 1e-2;
@@ -381,19 +381,6 @@ int main (int argc, char *argv[])
 
         HYPRE_PCGGetNumIterations(solver, &num_iterations);
         HYPRE_PCGGetFinalRelativeResidualNorm(solver, &final_res_norm);
-	if (num_iterations == max_it)
-	{
-            printf("\n");
-            printf("Maximum number of iterations reached, convergence not acquired\n");
-	    return(-1);
-	}
-        if (myid == 0)
-        {
-            printf("\n");
-            printf("Iterations = %d\n", num_iterations);
-            printf("Final Relative Residual Norm = %e\n", final_res_norm);
-            printf("\n");
-        }
 
         /* Destroy solver */
         //HYPRE_ParCSRPCGDestroy(solver);
@@ -425,7 +412,7 @@ int main (int argc, char *argv[])
 	if (solver_id == 20) // AMG Precond
 	{
 		HYPRE_BoomerAMGCreate(&precond);
-		HYPRE_BoomerAMGSetPrintLevel(precond, 1); /* print amg solution info */
+		HYPRE_BoomerAMGSetPrintLevel(precond, 0); /* print amg solution info */
 		HYPRE_BoomerAMGSetCoarsenType(precond, 6);
 		HYPRE_BoomerAMGSetOldDefault(precond); 
 		HYPRE_BoomerAMGSetRelaxType(precond, 6); /* Sym G.S./Jacobi hybrid */
@@ -483,19 +470,6 @@ int main (int argc, char *argv[])
 	/* Run info - needed logging turned on */
 	HYPRE_GMRESGetNumIterations(solver, &num_iterations);
 	HYPRE_GMRESGetFinalRelativeResidualNorm(solver, &final_res_norm);
-	if (num_iterations == max_it)
-	{
-	    printf("\n");
-	    printf("Maximum number of iterations reached, convergence not acquired\n");
-	    return(-1);
-	}
-	if (myid == 0)
-	{
-	 printf("\n");
-	 printf("Iterations = %d\n", num_iterations);
-	 printf("Final Relative Residual Norm = %e\n", final_res_norm);
-	 printf("\n");
-	}
 
 	/* Destory solver and preconditioner */
 	//HYPRE_ParCSRGMRESDestroy(solver);
@@ -531,7 +505,7 @@ int main (int argc, char *argv[])
 	if (solver_id == 30) // AMG Precond
 	{
 		HYPRE_BoomerAMGCreate(&precond);
-		HYPRE_BoomerAMGSetPrintLevel(precond, 1); /* print amg solution info */
+		HYPRE_BoomerAMGSetPrintLevel(precond, 0); /* print amg solution info */
 		HYPRE_BoomerAMGSetCoarsenType(precond, 6);
 		HYPRE_BoomerAMGSetOldDefault(precond);
 		HYPRE_BoomerAMGSetRelaxType(precond, 6); /* Sym G.S./Jacobi hybrid */
@@ -584,19 +558,6 @@ int main (int argc, char *argv[])
         /* Run info - needed logging turned on */
         HYPRE_FlexGMRESGetNumIterations(solver, &num_iterations);
         HYPRE_FlexGMRESGetFinalRelativeResidualNorm(solver, &final_res_norm);
-	if (num_iterations == max_it)
-	{
-            printf("\n");
-            printf("Maximum number of iterations reached, convergence not acquired\n");
-	    return(-1);
-	}
-        if (myid == 0)
-        {
-          printf("\n");
-          printf("Iterations = %d\n", num_iterations);
-          printf("Final Relative Residual Norm = %e\n", final_res_norm);
-          printf("\n");
-        }
 
         /* Destory solver and preconditioner */
         //HYPRE_ParCSRFlexGMRESDestroy(solver);
@@ -614,6 +575,20 @@ int main (int argc, char *argv[])
       {
         if (myid ==0) printf("Invalid solver id specified.\n");
       }
+
+	if (num_iterations == max_it)
+	{
+	    printf("\n");
+	    printf("Maximum number of iterations reached, convergence not acquired\n");
+	    return(-1);
+	}
+	if (myid == 0)
+	{
+	 printf("\n");
+	 printf("Iterations = %d\n", num_iterations);
+	 printf("Final Relative Residual Norm = %e\n", final_res_norm);
+	 printf("\n");
+	}
 
     // bi_prod = <f,f> + <h,h>
     HYPRE_ParVectorInnerProd(par_f, par_f, bi_prod);//+ inner(h,h) but equal to 0 !!!!!!!
@@ -634,11 +609,12 @@ int main (int argc, char *argv[])
     }
 
   // Loop Starts Here
-  for (it = 0; it < max_it; it++) 
+  for (it = 1; it < max_it; it++) 
     { 
       
     // transFirst = G*d_2 
     HYPRE_ParCSRMatrixMatvec( 1.0 , parcsr_G , par_D_2 , 0.0 , par_TransFirst );
+
 
     if (solver_id < 10)
       {
@@ -673,8 +649,7 @@ int main (int argc, char *argv[])
 	HYPRE_GMRESGetFinalRelativeResidualNorm(solver, &final_res_norm);
 
 	/* Destory solver and preconditioner */
-	HYPRE_ParCSRGMRESDestroy(solver);
-
+	//HYPRE_ParCSRGMRESDestroy(solver);
 	//if (solver_id == 20)
 	//{
 	//  HYPRE_BoomerAMGDestroy(precond);
@@ -695,8 +670,8 @@ int main (int argc, char *argv[])
         HYPRE_FlexGMRESGetNumIterations(solver, &num_iterations);
         HYPRE_FlexGMRESGetFinalRelativeResidualNorm(solver, &final_res_norm);
 
-        HYPRE_ParCSRFlexGMRESDestroy(solver);
-
+	/* Destory solver and preconditioner */
+        //HYPRE_ParCSRFlexGMRESDestroy(solver);
         //if (solver_id == 30)
         //{
 	//   HYPRE_BoomerAMGDestroy(precond);
@@ -758,9 +733,10 @@ int main (int argc, char *argv[])
 
     if (myid == 0)
       {  
-	     printf("Iteration num %d\n", it);
+        printf("Iteration num %d\n", it);
         printf("Relative residual is %.5e, relative direction is %.5e\n", abba[0]/sqrt(bi_prod[0]), dConv[0]);
       }
+
 
     if (((abba[0]/sqrt(bi_prod[0]))<tol_r) && (dConv[0] < tol_d))
       {
@@ -828,6 +804,7 @@ int main (int argc, char *argv[])
     // d_2vector = residual + beta * d_2vector;
     HYPRE_ParVectorScale( beta[0], par_D_2);
     hypre_ParVectorAxpy( 1.0, par_residual, par_D_2);
+
 
  }
 
