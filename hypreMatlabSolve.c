@@ -406,7 +406,7 @@ int main (int argc, char *argv[])
 	HYPRE_GMRESSetMaxIter(solver, max_it); /* max iterations */
 	HYPRE_GMRESSetKDim(solver, 30);
 	HYPRE_GMRESSetTol(solver, 1e-7); /* conv. tolerance */
-	HYPRE_GMRESSetPrintLevel(solver, 2); /* print solve info */
+	HYPRE_GMRESSetPrintLevel(solver, 0); /* print solve info */
 	HYPRE_GMRESSetLogging(solver, 1); /* needed to get run info later */
 
 	if (solver_id == 20) // AMG Precond
@@ -499,7 +499,7 @@ int main (int argc, char *argv[])
         HYPRE_FlexGMRESSetKDim(solver, restart);
         HYPRE_FlexGMRESSetMaxIter(solver, max_it); /* max iterations */
         HYPRE_FlexGMRESSetTol(solver, 1e-7); /* conv. tolerance */
-        HYPRE_FlexGMRESSetPrintLevel(solver, 2); /* print solve info */
+        HYPRE_FlexGMRESSetPrintLevel(solver, 0); /* print solve info */
         HYPRE_FlexGMRESSetLogging(solver, 1); /* needed to get run info later */
 
 	if (solver_id == 30) // AMG Precond
