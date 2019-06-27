@@ -282,10 +282,10 @@ int main (int argc, char *argv[])
     par_TransSecond = (HYPRE_ParVector) object;
 
     // Create the assigned variables for the resolution
-    HYPRE_Real *bi_prod, *alpha, *beta, *gamma, *gamma_old, *dConv;
+    HYPRE_Real *init_res, *alpha, *beta, *gamma, *gamma_old, *dConv;
     HYPRE_Real *abba;
 
-    bi_prod = hypre_CTAlloc(HYPRE_Real, 1);
+    init_res = hypre_CTAlloc(HYPRE_Real, 1);
     alpha = hypre_CTAlloc(HYPRE_Real, 1);
     beta = hypre_CTAlloc(HYPRE_Real, 1);
     gamma = hypre_CTAlloc(HYPRE_Real, 1);
@@ -591,9 +591,9 @@ int main (int argc, char *argv[])
 	}
 
     // bi_prod = <f,f> + <h,h>
-    HYPRE_ParVectorInnerProd(par_f, par_f, bi_prod);//+ inner(h,h) but equal to 0 !!!!!!!
-    HYPRE_ParVectorInnerProd(par_h, par_h, abba);
-    bi_prod[0] += abba[0];
+    //HYPRE_ParVectorInnerProd(par_f, par_f, bi_prod);//+ inner(h,h) but equal to 0 !!!!!!!
+    //HYPRE_ParVectorInnerProd(par_h, par_h, abba);
+    //bi_prod[0] += abba[0];
 
     // res = GT*u
     HYPRE_ParCSRMatrixMatvecT( 1.0 , parcsr_G , par_vel , 0.0 , par_residual );
@@ -602,6 +602,7 @@ int main (int argc, char *argv[])
 
     // < res, res >
     HYPRE_ParVectorInnerProd(par_residual, par_residual, gamma);
+    init_res[0] = gamma[0];
    
     if (myid == 0)
     {
@@ -733,12 +734,11 @@ int main (int argc, char *argv[])
 
     if (myid == 0)
       {  
-        printf("Iteration num %d\n", it);
-        printf("Relative residual is %.5e, relative direction is %.5e\n", abba[0]/sqrt(bi_prod[0]), dConv[0]);
+        printf("Uzawa it %d\n: Relative residual is %.5e, relative direction is %.5e\n",it, abba[0]/sqrt(init_res[0]), dConv[0]);
       }
 
 
-    if (((abba[0]/sqrt(bi_prod[0]))<tol_r) && (dConv[0] < tol_d))
+    if (((abba[0]/sqrt(init_res[0]))<tol_r) && (dConv[0] < tol_d))
       {
         HYPRE_ParVectorPrint( par_vel , "solution_Vel.0" );
         HYPRE_ParVectorPrint( par_pres , "solution_Pres.0" );
