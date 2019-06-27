@@ -94,7 +94,7 @@ int main (int argc, char *argv[])
     }
     hypre_fscanf(fset, "%d\n", &solver_id);
     hypre_fscanf(fset, "%d\n", &num_procs);
-    hypre_fscanf(fset, "%d\n", &dummy);
+    hypre_fscanf(fset, "%e\n", &dummy);
     hypre_fscanf(fset, "%c\n", &saveMatsAs);
     fclose(fset);
 
